@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Key Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .api-key-display {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            word-break: break-all;
+            font-family: monospace;
+            border: 1px solid #dee2e6;
+            font-size: 13px;
+        }
+
+        .keys-list {
+            margin-top: 15px;
+        }
+
+        .key-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 3px solid #007bff;
+        }
+
+        .key-item p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .key-item .api-key-text {
+            font-family: monospace;
+            font-size: 12px;
+            color: #333;
+            word-break: break-all;
+            background: white;
+            padding: 8px;
+            border-radius: 3px;
+            margin: 8px 0;
+        }
+
+        .api-box {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px;
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 10px;
+        }
+
+        .api-box-left {
+            border-right: 2px solid #e9ecef;
+            padding-right: 15px;
+        }
+
+        .api-box-left h3 {
+            color: #007bff;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .api-box-left p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .api-box-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .api-box-right .api-key-text {
+            font-family: monospace;
+            font-size: 12px;
+            color: #333;
+            word-break: break-all;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .api-box {
+                grid-template-columns: 1fr;
+            }
+            
+            .api-box-left {
+                border-right: none;
+                border-bottom: 2px solid #e9ecef;
+                padding-right: 0;
+                padding-bottom: 15px;
+            }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .copy-btn {
+            background: #17a2b8;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .copy-btn:hover {
+            background: #138496;
+        }
+
+        .regenerate-btn {
+            background: #ffc107;
+            color: #000;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .regenerate-btn:hover {
+            background: #e0a800;
+        }
+
+        .stats {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-box h3 {
+            font-size: 2em;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+
+        .stat-box p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Key Management</h1>
+
+        <!-- Statistics -->
+        <div class="stats">
+            <div class="stat-box">
+                <h3 id="totalKeys">0</h3>
+                <p>Total API Keys</p>
+            </div>
+        </div>
+
+        <!-- Generate API Key -->
+        <div class="card">
+            <h2>Generate API Key</h2>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" placeholder="Masukkan username">
+            </div>
+            <div class="form-group">
+                <label for="apiName">Nama API:</label>
+                <input type="text" id="apiName" placeholder="Contoh: Weather API, Payment API, dll">
+            </div>
+            <button onclick="generateApiKey()">Generate Key</button>
+            <div id="generateResult" class="result"></div>
+        </div>
+
+        <!-- List All Keys -->
+        <div class="card">
+            <h2>Daftar API Keys</h2>
+            <button onclick="loadApiKeys()" class="btn-success">Refresh</button>
+            <div id="keysList" class="keys-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load keys on page load
+        window.onload = function() {
+            loadApiKeys();
+        };
+
+        // Generate API Key
+        async function generateApiKey() {
+            const username = document.getElementById('username').value;
+            const apiName = document.getElementById('apiName').value;
+            const resultDiv = document.getElementById('generateResult');
+
+            if (!username) {
+                showResult(resultDiv, 'Username harus diisi!', 'error');
+                return;
+            }
+
+            if (!apiName) {
+                showResult(resultDiv, 'Nama API harus diisi!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/generate-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, apiName })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="api-key-display">
+                            <strong>API Key Berhasil Dibuat!</strong><br>
+                            <strong>ID:</strong> ${data.apiId}<br>
+                            <strong>Username:</strong> ${data.username}<br>
+                            <strong>Nama API:</strong> ${data.apiName}<br>
+                            <strong>API Key:</strong> ${data.apiKey}<br>
+                            <strong>API Secret:</strong> ${data.apiSecret}<br>
+                            <strong>Dibuat:</strong> ${new Date(data.createdAt).toLocaleString('id-ID')}<br>
+                            <em style="color: #856404; background: #fff3cd; padding: 8px; display: block; margin-top: 8px; border-radius: 3px;">⚠️ ${data.note}</em>
+                            <div style="margin-top: 10px;">
+                                <button class="copy-btn" onclick="copyToClipboard('${data.apiKey}')">Copy Key</button>
+                                <button class="copy-btn" onclick="copyToClipboard('${data.apiSecret}')">Copy Secret</button>
+                            </div>
+                        </div>
+                    `;
+                    resultDiv.className = 'result success';
+                    resultDiv.style.display = 'block';
+                    
+                    document.getElementById('username').value = '';
+                    document.getElementById('apiName').value = '';
+                    loadApiKeys();
+                } else {
+                    showResult(resultDiv, data.message, 'error');
+                }
+            } catch (error) {
+                showResult(resultDiv, 'Terjadi kesalahan: ' + error.message, 'error');
+            }
+        }
+
+        // Validate API Key
+        async function validateApiKey() {
+            const apiKey = document.getElementById('validateKey').value;
+            const resultDiv = document.getElementById('validateResult');
+
+            if (!apiKey) {
+                showResult(resultDiv, 'API Key harus diisi!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/validate-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ apiKey })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <strong>API Key Valid!</strong><br>
+                        Username: ${data.data.username}<br>
+                        Dibuat: ${new Date(data.data.createdAt).toLocaleString('id-ID')}<br>
+                        ${data.data.lastUsed ? `Terakhir digunakan: ${new Date(data.data.lastUsed).toLocaleString('id-ID')}` : 'Belum pernah digunakan'}
+                    `;
+                    resultDiv.className = 'result success';
+                } else {
+                    showResult(resultDiv, data.message, 'error');
+                }
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                showResult(resultDiv, 'Terjadi kesalahan: ' + error.message, 'error');
+            }
+        }
+
+        // Test Protected Endpoint
+        async function testProtectedEndpoint() {
+            const apiKey = document.getElementById('testKey').value;
+            const resultDiv = document.getElementById('testResult');
+
+            if (!apiKey) {
+                showResult(resultDiv, 'API Key harus diisi!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/protected-data', {
+                    method: 'GET',
+                    headers: {
+                        'x-api-key': apiKey
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <strong>Akses Berhasil!</strong><br>
+                        Message: ${data.data.message}<br>
+                        User: ${data.data.user}<br>
+                        Timestamp: ${new Date(data.data.timestamp).toLocaleString('id-ID')}
+                    `;
+                    resultDiv.className = 'result success';
+                } else {
+                    showResult(resultDiv, data.message, 'error');
+                }
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                showResult(resultDiv, 'Terjadi kesalahan: ' + error.message, 'error');
+            }
+        }
+
+        // Load all API Keys
+        async function loadApiKeys() {
+            const keysListDiv = document.getElementById('keysList');
+
+            try {
+                const response = await fetch('/api/keys');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('totalKeys').textContent = data.count;
+
+                    if (data.keys.length === 0) {
+                        keysListDiv.innerHTML = '<p style="text-align: center; color: #666; margin-top: 20px;">Belum ada API Key yang dibuat.</p>';
+                        return;
+                    }
+
+                    keysListDiv.innerHTML = data.keys.map(key => `
+                        <div class="api-box">
+                            <div class="api-box-left">
+                                <h3>${key.apiName}</h3>
+                                <p><strong>ID:</strong> ${key.id || 'N/A'}</p>
+                                <p><strong>Username:</strong> ${key.username}</p>
+                                <p><strong>Dibuat:</strong> ${new Date(key.createdAt).toLocaleString('id-ID')}</p>
+                                ${key.lastUsed ? `<p><strong>Terakhir digunakan:</strong> ${new Date(key.lastUsed).toLocaleString('id-ID')}</p>` : '<p>Belum pernah digunakan</p>'}
+                            </div>
+                            <div class="api-box-right">
+                                <p class="api-key-text">${key.apiKey}</p>
+                                <p style="font-size: 11px; color: #666; margin-bottom: 5px;">Hash: ${key.hash ? key.hash.substring(0, 16) + '...' : 'N/A'}</p>
+                                <div class="button-group">
+                                    <button class="copy-btn" onclick="copyToClipboard('${key.apiKey}')">Copy</button>
+                                    <button class="regenerate-btn" onclick="regenerateApiKey('${key.apiKey}')">Regenerate</button>
+                                    <button class="btn-danger" onclick="deleteApiKey('${key.apiKey}')">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                keysListDiv.innerHTML = `<p style="color: red;">Error loading keys: ${error.message}</p>`;
+            }
+        }
+
+        // Delete API Key
+        async function deleteApiKey(apiKey) {
+            if (!confirm('Apakah Anda yakin ingin menghapus API Key ini?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/delete-key', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ apiKey })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('API Key berhasil dihapus!');
+                    loadApiKeys();
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan: ' + error.message);
+            }
+        }
+
+        // Regenerate API Key
+        async function regenerateApiKey(oldApiKey) {
+            if (!confirm('Generate API Key baru? Key lama akan diganti tetapi Nama API tetap sama.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/regenerate-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ oldApiKey })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const message = `API Key berhasil di-regenerate!\n\n` +
+                                  `Key Baru: ${data.newApiKey.substring(0, 20)}...\n` +
+                                  `Secret Baru: ${data.newApiSecret.substring(0, 20)}...\n\n` +
+                                  `${data.note}`;
+                    alert(message);
+                    
+                    // Tampilkan info lengkap di console
+                    console.log('=== REGENERATED API KEY ===');
+                    console.log('Old Key:', data.oldApiKey);
+                    console.log('New Key:', data.newApiKey);
+                    console.log('New Secret:', data.newApiSecret);
+                    console.log('API Name:', data.apiName);
+                    console.log('==========================');
+                    
+                    loadApiKeys();
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan: ' + error.message);
+            }
+        }
+
+        // Copy to Clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('API Key berhasil disalin!');
+            }).catch(err => {
+                alert('Gagal menyalin: ' + err);
+            });
+        }
+
+        // Show Result Helper
+        function showResult(element, message, type) {
+            element.innerHTML = message;
+            element.className = `result ${type}`;
+            element.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
